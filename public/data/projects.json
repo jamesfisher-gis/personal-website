@@ -1,0 +1,19 @@
+{
+    "projects": [
+      {
+        "title": "Gaussian Splatting",
+        "image": "/data/scout.jpg",
+        "description": "Fun with creating Gaussian Splatting scenes with pictures taken on my travels."
+      },
+      {
+        "title": "Photogrammetry",
+        "image": "/data/scout.jpg",
+        "description": "View some phothgrammetric models made generated with open-source libraries."
+      },
+      {
+        "title": "Historical Markers Map",
+        "image": "/data/scout.jpg",
+        "description": "Explore the history of London with this interactive webmap of historical plaques across the city."
+      }
+    ]
+  }

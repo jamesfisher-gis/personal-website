@@ -104,7 +104,7 @@
   /* font-family: 'Shadows Into Light Two', cursive; */
 }
 #top-section p {
-  color:#e6ee9c;
+  color:#FB8B24;
   font-size: 20px;
   text-align: center;
 }
@@ -116,23 +116,6 @@
   font-size: 1.3rem;
   background-color: rgba(0,0,0,.2);
   color:#fff
-}
-#top-section input[type=search]:focus {
-  background-color: rgba(0,0,0,.1);
-}
-#top-section form {
-  display: flex;
-  justify-content: space-between;
-}
-#top-section button[type=submit] {
-  border-radius: 9999px;
-  color: rgba(255, 255, 255, 1);
-  background-color: rgba(255,255,255,.2);
-  height: 46px;
-  width: 46px;
-  border:0;
-  padding: 0;
-  margin-left:-50px
 }
 #top-section h1 + p {
   text-align: center;

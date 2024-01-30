@@ -4,10 +4,9 @@
   <nav class="py-2 fixed-top">
     <div class="container d-flex flex-wrap">
       <ul class="nav me-auto">
-        <!-- <li class="nav-item"><p class="nav-link px-2">James A Fisher</p></li> -->
         <li class="nav-item"><router-link to="/" class="nav-link px-2 active" aria-current="page">Home</router-link></li>
         <li class="nav-item"><a href="#" class="nav-link px-2">About Me</a></li>
-        <li class="nav-item"><a href="#" class="nav-link px-2">Projects</a></li>
+        <li class="nav-item"><router-link to="/projects" class="nav-link px-2 active" aria-current="page">Projects</router-link></li>
         <li class="nav-item"><a href="#" class="nav-link px-2">Contact</a></li>
       </ul>
     </div>

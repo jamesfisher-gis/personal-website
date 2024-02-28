@@ -27,6 +27,10 @@
         </div>
             <div class="instructions-window" @click="toggleInstructions">
             <img src="/assets/help.svg" alt="Instructions Logo" class="instructions-logo">
+            <select v-model="selectedOption" @change="updateQueryParam" class="dropdown">
+                <option value="herodotus.splat">Herodotus</option>
+                <option value="dragon.splat">Dragon</option>
+            </select>
             <div class="instructions-content" :class="{ 'expanded': isInstructionsExpanded }">
                 <div id="instructions">
                     <h6><b>Controls</b></h6>
@@ -54,7 +58,7 @@
 </template>
 
 <script setup>
-  import { onMounted, ref } from 'vue';
+  import { onMounted, ref, watch } from 'vue';
   const isInstructionsExpanded = ref(false);
 
   const toggleInstructions = () => {
@@ -215,269 +219,269 @@
         fy: 1164.6601287484507,
         fx: 1159.5880733038064,
     },
-];
-
-let camera = cameras[0];
-
-function getProjectionMatrix(fx, fy, width, height) {
-    const znear = 0.2;
-    const zfar = 200;
-    return [
-        [(2 * fx) / width, 0, 0, 0],
-        [0, -(2 * fy) / height, 0, 0],
-        [0, 0, zfar / (zfar - znear), 1],
-        [0, 0, -(zfar * znear) / (zfar - znear), 0],
-    ].flat();
-}
-
-function getViewMatrix(camera) {
-    const R = camera.rotation.flat();
-    const t = camera.position;
-    const camToWorld = [
-        [R[0], R[1], R[2], 0],
-        [R[3], R[4], R[5], 0],
-        [R[6], R[7], R[8], 0],
-        [
-            -t[0] * R[0] - t[1] * R[3] - t[2] * R[6],
-            -t[0] * R[1] - t[1] * R[4] - t[2] * R[7],
-            -t[0] * R[2] - t[1] * R[5] - t[2] * R[8],
-            1,
-        ],
-    ].flat();
-    return camToWorld;
-}
-// function translate4(a, x, y, z) {
-//     return [
-//         ...a.slice(0, 12),
-//         a[0] * x + a[4] * y + a[8] * z + a[12],
-//         a[1] * x + a[5] * y + a[9] * z + a[13],
-//         a[2] * x + a[6] * y + a[10] * z + a[14],
-//         a[3] * x + a[7] * y + a[11] * z + a[15],
-//     ];
-// }
-
-function multiply4(a, b) {
-    return [
-        b[0] * a[0] + b[1] * a[4] + b[2] * a[8] + b[3] * a[12],
-        b[0] * a[1] + b[1] * a[5] + b[2] * a[9] + b[3] * a[13],
-        b[0] * a[2] + b[1] * a[6] + b[2] * a[10] + b[3] * a[14],
-        b[0] * a[3] + b[1] * a[7] + b[2] * a[11] + b[3] * a[15],
-        b[4] * a[0] + b[5] * a[4] + b[6] * a[8] + b[7] * a[12],
-        b[4] * a[1] + b[5] * a[5] + b[6] * a[9] + b[7] * a[13],
-        b[4] * a[2] + b[5] * a[6] + b[6] * a[10] + b[7] * a[14],
-        b[4] * a[3] + b[5] * a[7] + b[6] * a[11] + b[7] * a[15],
-        b[8] * a[0] + b[9] * a[4] + b[10] * a[8] + b[11] * a[12],
-        b[8] * a[1] + b[9] * a[5] + b[10] * a[9] + b[11] * a[13],
-        b[8] * a[2] + b[9] * a[6] + b[10] * a[10] + b[11] * a[14],
-        b[8] * a[3] + b[9] * a[7] + b[10] * a[11] + b[11] * a[15],
-        b[12] * a[0] + b[13] * a[4] + b[14] * a[8] + b[15] * a[12],
-        b[12] * a[1] + b[13] * a[5] + b[14] * a[9] + b[15] * a[13],
-        b[12] * a[2] + b[13] * a[6] + b[14] * a[10] + b[15] * a[14],
-        b[12] * a[3] + b[13] * a[7] + b[14] * a[11] + b[15] * a[15],
     ];
-}
 
-function invert4(a) {
-    let b00 = a[0] * a[5] - a[1] * a[4];
-    let b01 = a[0] * a[6] - a[2] * a[4];
-    let b02 = a[0] * a[7] - a[3] * a[4];
-    let b03 = a[1] * a[6] - a[2] * a[5];
-    let b04 = a[1] * a[7] - a[3] * a[5];
-    let b05 = a[2] * a[7] - a[3] * a[6];
-    let b06 = a[8] * a[13] - a[9] * a[12];
-    let b07 = a[8] * a[14] - a[10] * a[12];
-    let b08 = a[8] * a[15] - a[11] * a[12];
-    let b09 = a[9] * a[14] - a[10] * a[13];
-    let b10 = a[9] * a[15] - a[11] * a[13];
-    let b11 = a[10] * a[15] - a[11] * a[14];
-    let det =
-        b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
-    if (!det) return null;
-    return [
-        (a[5] * b11 - a[6] * b10 + a[7] * b09) / det,
-        (a[2] * b10 - a[1] * b11 - a[3] * b09) / det,
-        (a[13] * b05 - a[14] * b04 + a[15] * b03) / det,
-        (a[10] * b04 - a[9] * b05 - a[11] * b03) / det,
-        (a[6] * b08 - a[4] * b11 - a[7] * b07) / det,
-        (a[0] * b11 - a[2] * b08 + a[3] * b07) / det,
-        (a[14] * b02 - a[12] * b05 - a[15] * b01) / det,
-        (a[8] * b05 - a[10] * b02 + a[11] * b01) / det,
-        (a[4] * b10 - a[5] * b08 + a[7] * b06) / det,
-        (a[1] * b08 - a[0] * b10 - a[3] * b06) / det,
-        (a[12] * b04 - a[13] * b02 + a[15] * b00) / det,
-        (a[9] * b02 - a[8] * b04 - a[11] * b00) / det,
-        (a[5] * b07 - a[4] * b09 - a[6] * b06) / det,
-        (a[0] * b09 - a[1] * b07 + a[2] * b06) / det,
-        (a[13] * b01 - a[12] * b03 - a[14] * b00) / det,
-        (a[8] * b03 - a[9] * b01 + a[10] * b00) / det,
-    ];
-}
+    let camera = cameras[0];
 
-function rotate4(a, rad, x, y, z) {
-    let len = Math.hypot(x, y, z);
-    x /= len;
-    y /= len;
-    z /= len;
-    let s = Math.sin(rad);
-    let c = Math.cos(rad);
-    let t = 1 - c;
-    let b00 = x * x * t + c;
-    let b01 = y * x * t + z * s;
-    let b02 = z * x * t - y * s;
-    let b10 = x * y * t - z * s;
-    let b11 = y * y * t + c;
-    let b12 = z * y * t + x * s;
-    let b20 = x * z * t + y * s;
-    let b21 = y * z * t - x * s;
-    let b22 = z * z * t + c;
-    return [
-        a[0] * b00 + a[4] * b01 + a[8] * b02,
-        a[1] * b00 + a[5] * b01 + a[9] * b02,
-        a[2] * b00 + a[6] * b01 + a[10] * b02,
-        a[3] * b00 + a[7] * b01 + a[11] * b02,
-        a[0] * b10 + a[4] * b11 + a[8] * b12,
-        a[1] * b10 + a[5] * b11 + a[9] * b12,
-        a[2] * b10 + a[6] * b11 + a[10] * b12,
-        a[3] * b10 + a[7] * b11 + a[11] * b12,
-        a[0] * b20 + a[4] * b21 + a[8] * b22,
-        a[1] * b20 + a[5] * b21 + a[9] * b22,
-        a[2] * b20 + a[6] * b21 + a[10] * b22,
-        a[3] * b20 + a[7] * b21 + a[11] * b22,
-        ...a.slice(12, 16),
-    ];
-}
+    function getProjectionMatrix(fx, fy, width, height) {
+        const znear = 0.2;
+        const zfar = 200;
+        return [
+            [(2 * fx) / width, 0, 0, 0],
+            [0, -(2 * fy) / height, 0, 0],
+            [0, 0, zfar / (zfar - znear), 1],
+            [0, 0, -(zfar * znear) / (zfar - znear), 0],
+        ].flat();
+    }
 
-function translate4(a, x, y, z) {
-    return [
-        ...a.slice(0, 12),
-        a[0] * x + a[4] * y + a[8] * z + a[12],
-        a[1] * x + a[5] * y + a[9] * z + a[13],
-        a[2] * x + a[6] * y + a[10] * z + a[14],
-        a[3] * x + a[7] * y + a[11] * z + a[15],
-    ];
-}
+    function getViewMatrix(camera) {
+        const R = camera.rotation.flat();
+        const t = camera.position;
+        const camToWorld = [
+            [R[0], R[1], R[2], 0],
+            [R[3], R[4], R[5], 0],
+            [R[6], R[7], R[8], 0],
+            [
+                -t[0] * R[0] - t[1] * R[3] - t[2] * R[6],
+                -t[0] * R[1] - t[1] * R[4] - t[2] * R[7],
+                -t[0] * R[2] - t[1] * R[5] - t[2] * R[8],
+                1,
+            ],
+        ].flat();
+        return camToWorld;
+    }
+    // function translate4(a, x, y, z) {
+    //     return [
+    //         ...a.slice(0, 12),
+    //         a[0] * x + a[4] * y + a[8] * z + a[12],
+    //         a[1] * x + a[5] * y + a[9] * z + a[13],
+    //         a[2] * x + a[6] * y + a[10] * z + a[14],
+    //         a[3] * x + a[7] * y + a[11] * z + a[15],
+    //     ];
+    // }
 
-function createWorker(self) {
-    let buffer;
-    let vertexCount = 0;
-    let viewProj;
-    // 6*4 + 4 + 4 = 8*4
-    // XYZ - Position (Float32)
-    // XYZ - Scale (Float32)
-    // RGBA - colors (uint8)
-    // IJKL - quaternion/rot (uint8)
-    const rowLength = 3 * 4 + 3 * 4 + 4 + 4;
-    let lastProj = [];
-    let depthIndex = new Uint32Array();
-    let lastVertexCount = 0;
+    function multiply4(a, b) {
+        return [
+            b[0] * a[0] + b[1] * a[4] + b[2] * a[8] + b[3] * a[12],
+            b[0] * a[1] + b[1] * a[5] + b[2] * a[9] + b[3] * a[13],
+            b[0] * a[2] + b[1] * a[6] + b[2] * a[10] + b[3] * a[14],
+            b[0] * a[3] + b[1] * a[7] + b[2] * a[11] + b[3] * a[15],
+            b[4] * a[0] + b[5] * a[4] + b[6] * a[8] + b[7] * a[12],
+            b[4] * a[1] + b[5] * a[5] + b[6] * a[9] + b[7] * a[13],
+            b[4] * a[2] + b[5] * a[6] + b[6] * a[10] + b[7] * a[14],
+            b[4] * a[3] + b[5] * a[7] + b[6] * a[11] + b[7] * a[15],
+            b[8] * a[0] + b[9] * a[4] + b[10] * a[8] + b[11] * a[12],
+            b[8] * a[1] + b[9] * a[5] + b[10] * a[9] + b[11] * a[13],
+            b[8] * a[2] + b[9] * a[6] + b[10] * a[10] + b[11] * a[14],
+            b[8] * a[3] + b[9] * a[7] + b[10] * a[11] + b[11] * a[15],
+            b[12] * a[0] + b[13] * a[4] + b[14] * a[8] + b[15] * a[12],
+            b[12] * a[1] + b[13] * a[5] + b[14] * a[9] + b[15] * a[13],
+            b[12] * a[2] + b[13] * a[6] + b[14] * a[10] + b[15] * a[14],
+            b[12] * a[3] + b[13] * a[7] + b[14] * a[11] + b[15] * a[15],
+        ];
+    }
 
-    var _floatView = new Float32Array(1);
-    var _int32View = new Int32Array(_floatView.buffer);
+    function invert4(a) {
+        let b00 = a[0] * a[5] - a[1] * a[4];
+        let b01 = a[0] * a[6] - a[2] * a[4];
+        let b02 = a[0] * a[7] - a[3] * a[4];
+        let b03 = a[1] * a[6] - a[2] * a[5];
+        let b04 = a[1] * a[7] - a[3] * a[5];
+        let b05 = a[2] * a[7] - a[3] * a[6];
+        let b06 = a[8] * a[13] - a[9] * a[12];
+        let b07 = a[8] * a[14] - a[10] * a[12];
+        let b08 = a[8] * a[15] - a[11] * a[12];
+        let b09 = a[9] * a[14] - a[10] * a[13];
+        let b10 = a[9] * a[15] - a[11] * a[13];
+        let b11 = a[10] * a[15] - a[11] * a[14];
+        let det =
+            b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
+        if (!det) return null;
+        return [
+            (a[5] * b11 - a[6] * b10 + a[7] * b09) / det,
+            (a[2] * b10 - a[1] * b11 - a[3] * b09) / det,
+            (a[13] * b05 - a[14] * b04 + a[15] * b03) / det,
+            (a[10] * b04 - a[9] * b05 - a[11] * b03) / det,
+            (a[6] * b08 - a[4] * b11 - a[7] * b07) / det,
+            (a[0] * b11 - a[2] * b08 + a[3] * b07) / det,
+            (a[14] * b02 - a[12] * b05 - a[15] * b01) / det,
+            (a[8] * b05 - a[10] * b02 + a[11] * b01) / det,
+            (a[4] * b10 - a[5] * b08 + a[7] * b06) / det,
+            (a[1] * b08 - a[0] * b10 - a[3] * b06) / det,
+            (a[12] * b04 - a[13] * b02 + a[15] * b00) / det,
+            (a[9] * b02 - a[8] * b04 - a[11] * b00) / det,
+            (a[5] * b07 - a[4] * b09 - a[6] * b06) / det,
+            (a[0] * b09 - a[1] * b07 + a[2] * b06) / det,
+            (a[13] * b01 - a[12] * b03 - a[14] * b00) / det,
+            (a[8] * b03 - a[9] * b01 + a[10] * b00) / det,
+        ];
+    }
 
-    function floatToHalf(float) {
-        _floatView[0] = float;
-        var f = _int32View[0];
+    function rotate4(a, rad, x, y, z) {
+        let len = Math.hypot(x, y, z);
+        x /= len;
+        y /= len;
+        z /= len;
+        let s = Math.sin(rad);
+        let c = Math.cos(rad);
+        let t = 1 - c;
+        let b00 = x * x * t + c;
+        let b01 = y * x * t + z * s;
+        let b02 = z * x * t - y * s;
+        let b10 = x * y * t - z * s;
+        let b11 = y * y * t + c;
+        let b12 = z * y * t + x * s;
+        let b20 = x * z * t + y * s;
+        let b21 = y * z * t - x * s;
+        let b22 = z * z * t + c;
+        return [
+            a[0] * b00 + a[4] * b01 + a[8] * b02,
+            a[1] * b00 + a[5] * b01 + a[9] * b02,
+            a[2] * b00 + a[6] * b01 + a[10] * b02,
+            a[3] * b00 + a[7] * b01 + a[11] * b02,
+            a[0] * b10 + a[4] * b11 + a[8] * b12,
+            a[1] * b10 + a[5] * b11 + a[9] * b12,
+            a[2] * b10 + a[6] * b11 + a[10] * b12,
+            a[3] * b10 + a[7] * b11 + a[11] * b12,
+            a[0] * b20 + a[4] * b21 + a[8] * b22,
+            a[1] * b20 + a[5] * b21 + a[9] * b22,
+            a[2] * b20 + a[6] * b21 + a[10] * b22,
+            a[3] * b20 + a[7] * b21 + a[11] * b22,
+            ...a.slice(12, 16),
+        ];
+    }
 
-        var sign = (f >> 31) & 0x0001;
-        var exp = (f >> 23) & 0x00ff;
-        var frac = f & 0x007fffff;
+    function translate4(a, x, y, z) {
+        return [
+            ...a.slice(0, 12),
+            a[0] * x + a[4] * y + a[8] * z + a[12],
+            a[1] * x + a[5] * y + a[9] * z + a[13],
+            a[2] * x + a[6] * y + a[10] * z + a[14],
+            a[3] * x + a[7] * y + a[11] * z + a[15],
+        ];
+    }
 
-        var newExp;
-        if (exp == 0) {
-            newExp = 0;
-        } else if (exp < 113) {
-            newExp = 0;
-            frac |= 0x00800000;
-            frac = frac >> (113 - exp);
-            if (frac & 0x01000000) {
-                newExp = 1;
+    function createWorker(self) {
+        let buffer;
+        let vertexCount = 0;
+        let viewProj;
+        // 6*4 + 4 + 4 = 8*4
+        // XYZ - Position (Float32)
+        // XYZ - Scale (Float32)
+        // RGBA - colors (uint8)
+        // IJKL - quaternion/rot (uint8)
+        const rowLength = 3 * 4 + 3 * 4 + 4 + 4;
+        let lastProj = [];
+        let depthIndex = new Uint32Array();
+        let lastVertexCount = 0;
+
+        var _floatView = new Float32Array(1);
+        var _int32View = new Int32Array(_floatView.buffer);
+
+        function floatToHalf(float) {
+            _floatView[0] = float;
+            var f = _int32View[0];
+
+            var sign = (f >> 31) & 0x0001;
+            var exp = (f >> 23) & 0x00ff;
+            var frac = f & 0x007fffff;
+
+            var newExp;
+            if (exp == 0) {
+                newExp = 0;
+            } else if (exp < 113) {
+                newExp = 0;
+                frac |= 0x00800000;
+                frac = frac >> (113 - exp);
+                if (frac & 0x01000000) {
+                    newExp = 1;
+                    frac = 0;
+                }
+            } else if (exp < 142) {
+                newExp = exp - 112;
+            } else {
+                newExp = 31;
                 frac = 0;
             }
-        } else if (exp < 142) {
-            newExp = exp - 112;
-        } else {
-            newExp = 31;
-            frac = 0;
+
+            return (sign << 15) | (newExp << 10) | (frac >> 13);
         }
 
-        return (sign << 15) | (newExp << 10) | (frac >> 13);
-    }
-
-    function packHalf2x16(x, y) {
-        return (floatToHalf(x) | (floatToHalf(y) << 16)) >>> 0;
-    }
-
-    function generateTexture() {
-        if (!buffer) return;
-        const f_buffer = new Float32Array(buffer);
-        const u_buffer = new Uint8Array(buffer);
-
-        var texwidth = 1024 * 2; // Set to your desired width
-        var texheight = Math.ceil((2 * vertexCount) / texwidth); // Set to your desired height
-        var texdata = new Uint32Array(texwidth * texheight * 4); // 4 components per pixel (RGBA)
-        var texdata_c = new Uint8Array(texdata.buffer);
-        var texdata_f = new Float32Array(texdata.buffer);
-
-        // Here we convert from a .splat file buffer into a texture
-        // With a little bit more foresight perhaps this texture file
-        // should have been the native format as it'd be very easy to
-        // load it into webgl.
-        for (let i = 0; i < vertexCount; i++) {
-            // x, y, z
-            texdata_f[8 * i + 0] = f_buffer[8 * i + 0];
-            texdata_f[8 * i + 1] = f_buffer[8 * i + 1];
-            texdata_f[8 * i + 2] = f_buffer[8 * i + 2];
-
-            // r, g, b, a
-            texdata_c[4 * (8 * i + 7) + 0] = u_buffer[32 * i + 24 + 0];
-            texdata_c[4 * (8 * i + 7) + 1] = u_buffer[32 * i + 24 + 1];
-            texdata_c[4 * (8 * i + 7) + 2] = u_buffer[32 * i + 24 + 2];
-            texdata_c[4 * (8 * i + 7) + 3] = u_buffer[32 * i + 24 + 3];
-
-            // quaternions
-            let scale = [
-                f_buffer[8 * i + 3 + 0],
-                f_buffer[8 * i + 3 + 1],
-                f_buffer[8 * i + 3 + 2],
-            ];
-            let rot = [
-                (u_buffer[32 * i + 28 + 0] - 128) / 128,
-                (u_buffer[32 * i + 28 + 1] - 128) / 128,
-                (u_buffer[32 * i + 28 + 2] - 128) / 128,
-                (u_buffer[32 * i + 28 + 3] - 128) / 128,
-            ];
-
-            // Compute the matrix product of S and R (M = S * R)
-            const M = [
-                1.0 - 2.0 * (rot[2] * rot[2] + rot[3] * rot[3]),
-                2.0 * (rot[1] * rot[2] + rot[0] * rot[3]),
-                2.0 * (rot[1] * rot[3] - rot[0] * rot[2]),
-
-                2.0 * (rot[1] * rot[2] - rot[0] * rot[3]),
-                1.0 - 2.0 * (rot[1] * rot[1] + rot[3] * rot[3]),
-                2.0 * (rot[2] * rot[3] + rot[0] * rot[1]),
-
-                2.0 * (rot[1] * rot[3] + rot[0] * rot[2]),
-                2.0 * (rot[2] * rot[3] - rot[0] * rot[1]),
-                1.0 - 2.0 * (rot[1] * rot[1] + rot[2] * rot[2]),
-            ].map((k, i) => k * scale[Math.floor(i / 3)]);
-
-            const sigma = [
-                M[0] * M[0] + M[3] * M[3] + M[6] * M[6],
-                M[0] * M[1] + M[3] * M[4] + M[6] * M[7],
-                M[0] * M[2] + M[3] * M[5] + M[6] * M[8],
-                M[1] * M[1] + M[4] * M[4] + M[7] * M[7],
-                M[1] * M[2] + M[4] * M[5] + M[7] * M[8],
-                M[2] * M[2] + M[5] * M[5] + M[8] * M[8],
-            ];
-
-            texdata[8 * i + 4] = packHalf2x16(4 * sigma[0], 4 * sigma[1]);
-            texdata[8 * i + 5] = packHalf2x16(4 * sigma[2], 4 * sigma[3]);
-            texdata[8 * i + 6] = packHalf2x16(4 * sigma[4], 4 * sigma[5]);
+        function packHalf2x16(x, y) {
+            return (floatToHalf(x) | (floatToHalf(y) << 16)) >>> 0;
         }
 
-        self.postMessage({ texdata, texwidth, texheight }, [texdata.buffer]);
-    }
+        function generateTexture() {
+            if (!buffer) return;
+            const f_buffer = new Float32Array(buffer);
+            const u_buffer = new Uint8Array(buffer);
+
+            var texwidth = 1024 * 2; // Set to your desired width
+            var texheight = Math.ceil((2 * vertexCount) / texwidth); // Set to your desired height
+            var texdata = new Uint32Array(texwidth * texheight * 4); // 4 components per pixel (RGBA)
+            var texdata_c = new Uint8Array(texdata.buffer);
+            var texdata_f = new Float32Array(texdata.buffer);
+
+            // Here we convert from a .splat file buffer into a texture
+            // With a little bit more foresight perhaps this texture file
+            // should have been the native format as it'd be very easy to
+            // load it into webgl.
+            for (let i = 0; i < vertexCount; i++) {
+                // x, y, z
+                texdata_f[8 * i + 0] = f_buffer[8 * i + 0];
+                texdata_f[8 * i + 1] = f_buffer[8 * i + 1];
+                texdata_f[8 * i + 2] = f_buffer[8 * i + 2];
+
+                // r, g, b, a
+                texdata_c[4 * (8 * i + 7) + 0] = u_buffer[32 * i + 24 + 0];
+                texdata_c[4 * (8 * i + 7) + 1] = u_buffer[32 * i + 24 + 1];
+                texdata_c[4 * (8 * i + 7) + 2] = u_buffer[32 * i + 24 + 2];
+                texdata_c[4 * (8 * i + 7) + 3] = u_buffer[32 * i + 24 + 3];
+
+                // quaternions
+                let scale = [
+                    f_buffer[8 * i + 3 + 0],
+                    f_buffer[8 * i + 3 + 1],
+                    f_buffer[8 * i + 3 + 2],
+                ];
+                let rot = [
+                    (u_buffer[32 * i + 28 + 0] - 128) / 128,
+                    (u_buffer[32 * i + 28 + 1] - 128) / 128,
+                    (u_buffer[32 * i + 28 + 2] - 128) / 128,
+                    (u_buffer[32 * i + 28 + 3] - 128) / 128,
+                ];
+
+                // Compute the matrix product of S and R (M = S * R)
+                const M = [
+                    1.0 - 2.0 * (rot[2] * rot[2] + rot[3] * rot[3]),
+                    2.0 * (rot[1] * rot[2] + rot[0] * rot[3]),
+                    2.0 * (rot[1] * rot[3] - rot[0] * rot[2]),
+
+                    2.0 * (rot[1] * rot[2] - rot[0] * rot[3]),
+                    1.0 - 2.0 * (rot[1] * rot[1] + rot[3] * rot[3]),
+                    2.0 * (rot[2] * rot[3] + rot[0] * rot[1]),
+
+                    2.0 * (rot[1] * rot[3] + rot[0] * rot[2]),
+                    2.0 * (rot[2] * rot[3] - rot[0] * rot[1]),
+                    1.0 - 2.0 * (rot[1] * rot[1] + rot[2] * rot[2]),
+                ].map((k, i) => k * scale[Math.floor(i / 3)]);
+
+                const sigma = [
+                    M[0] * M[0] + M[3] * M[3] + M[6] * M[6],
+                    M[0] * M[1] + M[3] * M[4] + M[6] * M[7],
+                    M[0] * M[2] + M[3] * M[5] + M[6] * M[8],
+                    M[1] * M[1] + M[4] * M[4] + M[7] * M[7],
+                    M[1] * M[2] + M[4] * M[5] + M[7] * M[8],
+                    M[2] * M[2] + M[5] * M[5] + M[8] * M[8],
+                ];
+
+                texdata[8 * i + 4] = packHalf2x16(4 * sigma[0], 4 * sigma[1]);
+                texdata[8 * i + 5] = packHalf2x16(4 * sigma[2], 4 * sigma[3]);
+                texdata[8 * i + 6] = packHalf2x16(4 * sigma[4], 4 * sigma[5]);
+            }
+
+            self.postMessage({ texdata, texwidth, texheight }, [texdata.buffer]);
+        }
 
     function runSort(viewProj) {
         if (!buffer) return;
@@ -712,105 +716,107 @@ function createWorker(self) {
             throttledSort();
         }
     };
-}
-
-const vertexShaderSource = `
-#version 300 es
-precision highp float;
-precision highp int;
-
-uniform highp usampler2D u_texture;
-uniform mat4 projection, view;
-uniform vec2 focal;
-uniform vec2 viewport;
-
-in vec2 position;
-in int index;
-
-out vec4 vColor;
-out vec2 vPosition;
-
-void main () {
-    uvec4 cen = texelFetch(u_texture, ivec2((uint(index) & 0x3ffu) << 1, uint(index) >> 10), 0);
-    vec4 cam = view * vec4(uintBitsToFloat(cen.xyz), 1);
-    vec4 pos2d = projection * cam;
-
-    float clip = 1.2 * pos2d.w;
-    if (pos2d.z < -clip || pos2d.x < -clip || pos2d.x > clip || pos2d.y < -clip || pos2d.y > clip) {
-        gl_Position = vec4(0.0, 0.0, 2.0, 1.0);
-        return;
     }
 
-    uvec4 cov = texelFetch(u_texture, ivec2(((uint(index) & 0x3ffu) << 1) | 1u, uint(index) >> 10), 0);
-    vec2 u1 = unpackHalf2x16(cov.x), u2 = unpackHalf2x16(cov.y), u3 = unpackHalf2x16(cov.z);
-    mat3 Vrk = mat3(u1.x, u1.y, u2.x, u1.y, u2.y, u3.x, u2.x, u3.x, u3.y);
+    const vertexShaderSource = `
+    #version 300 es
+    precision highp float;
+    precision highp int;
 
-    mat3 J = mat3(
-        focal.x / cam.z, 0., -(focal.x * cam.x) / (cam.z * cam.z), 
-        0., -focal.y / cam.z, (focal.y * cam.y) / (cam.z * cam.z), 
-        0., 0., 0.
-    );
+    uniform highp usampler2D u_texture;
+    uniform mat4 projection, view;
+    uniform vec2 focal;
+    uniform vec2 viewport;
 
-    mat3 T = transpose(mat3(view)) * J;
-    mat3 cov2d = transpose(T) * Vrk * T;
+    in vec2 position;
+    in int index;
 
-    float mid = (cov2d[0][0] + cov2d[1][1]) / 2.0;
-    float radius = length(vec2((cov2d[0][0] - cov2d[1][1]) / 2.0, cov2d[0][1]));
-    float lambda1 = mid + radius, lambda2 = mid - radius;
+    out vec4 vColor;
+    out vec2 vPosition;
 
-    if(lambda2 < 0.0) return;
-    vec2 diagonalVector = normalize(vec2(cov2d[0][1], lambda1 - cov2d[0][0]));
-    vec2 majorAxis = min(sqrt(2.0 * lambda1), 1024.0) * diagonalVector;
-    vec2 minorAxis = min(sqrt(2.0 * lambda2), 1024.0) * vec2(diagonalVector.y, -diagonalVector.x);
+    void main () {
+        uvec4 cen = texelFetch(u_texture, ivec2((uint(index) & 0x3ffu) << 1, uint(index) >> 10), 0);
+        vec4 cam = view * vec4(uintBitsToFloat(cen.xyz), 1);
+        vec4 pos2d = projection * cam;
 
-    vColor = clamp(pos2d.z/pos2d.w+1.0, 0.0, 1.0) * vec4((cov.w) & 0xffu, (cov.w >> 8) & 0xffu, (cov.w >> 16) & 0xffu, (cov.w >> 24) & 0xffu) / 255.0;
-    vPosition = position;
+        float clip = 1.2 * pos2d.w;
+        if (pos2d.z < -clip || pos2d.x < -clip || pos2d.x > clip || pos2d.y < -clip || pos2d.y > clip) {
+            gl_Position = vec4(0.0, 0.0, 2.0, 1.0);
+            return;
+        }
 
-    vec2 vCenter = vec2(pos2d) / pos2d.w;
-    gl_Position = vec4(
-        vCenter 
-        + position.x * majorAxis / viewport 
-        + position.y * minorAxis / viewport, 0.0, 1.0);
+        uvec4 cov = texelFetch(u_texture, ivec2(((uint(index) & 0x3ffu) << 1) | 1u, uint(index) >> 10), 0);
+        vec2 u1 = unpackHalf2x16(cov.x), u2 = unpackHalf2x16(cov.y), u3 = unpackHalf2x16(cov.z);
+        mat3 Vrk = mat3(u1.x, u1.y, u2.x, u1.y, u2.y, u3.x, u2.x, u3.x, u3.y);
 
-}
-`.trim();
+        mat3 J = mat3(
+            focal.x / cam.z, 0., -(focal.x * cam.x) / (cam.z * cam.z), 
+            0., -focal.y / cam.z, (focal.y * cam.y) / (cam.z * cam.z), 
+            0., 0., 0.
+        );
 
-const fragmentShaderSource = `
-#version 300 es
-precision highp float;
+        mat3 T = transpose(mat3(view)) * J;
+        mat3 cov2d = transpose(T) * Vrk * T;
 
-in vec4 vColor;
-in vec2 vPosition;
+        float mid = (cov2d[0][0] + cov2d[1][1]) / 2.0;
+        float radius = length(vec2((cov2d[0][0] - cov2d[1][1]) / 2.0, cov2d[0][1]));
+        float lambda1 = mid + radius, lambda2 = mid - radius;
 
-out vec4 fragColor;
+        if(lambda2 < 0.0) return;
+        vec2 diagonalVector = normalize(vec2(cov2d[0][1], lambda1 - cov2d[0][0]));
+        vec2 majorAxis = min(sqrt(2.0 * lambda1), 1024.0) * diagonalVector;
+        vec2 minorAxis = min(sqrt(2.0 * lambda2), 1024.0) * vec2(diagonalVector.y, -diagonalVector.x);
 
-void main () {
-    float A = -dot(vPosition, vPosition);
-    if (A < -4.0) discard;
-    float B = exp(A) * vColor.a;
-    fragColor = vec4(B * vColor.rgb, B);
-}
+        vColor = clamp(pos2d.z/pos2d.w+1.0, 0.0, 1.0) * vec4((cov.w) & 0xffu, (cov.w >> 8) & 0xffu, (cov.w >> 16) & 0xffu, (cov.w >> 24) & 0xffu) / 255.0;
+        vPosition = position;
 
-`.trim();
+        vec2 vCenter = vec2(pos2d) / pos2d.w;
+        gl_Position = vec4(
+            vCenter 
+            + position.x * majorAxis / viewport 
+            + position.y * minorAxis / viewport, 0.0, 1.0);
 
-let defaultViewMatrix = [
-    0.47, 0.04, 0.88, 0, -0.11, 0.99, 0.02, 0, -0.88, -0.11, 0.47, 0, 0.07,
-    0.03, 6.55, 1,
-];
-let viewMatrix = defaultViewMatrix;
-async function main() {
-    let carousel = true;
-    const params = new URLSearchParams(location.search);
-    try {
-        viewMatrix = JSON.parse(decodeURIComponent(location.hash.slice(1)));
-        carousel = false;
-    } catch (err) {}
-    const url = new URL(
-        // "nike.splat",
-        // location.href,
-        params.get("url") || "train.splat",
-        "https://huggingface.co/cakewalk/splat-data/resolve/main/",
-    );
+    }
+    `.trim();
+
+    const fragmentShaderSource = `
+    #version 300 es
+    precision highp float;
+
+    in vec4 vColor;
+    in vec2 vPosition;
+
+    out vec4 fragColor;
+
+    void main () {
+        float A = -dot(vPosition, vPosition);
+        if (A < -4.0) discard;
+        float B = exp(A) * vColor.a;
+        fragColor = vec4(B * vColor.rgb, B);
+    }
+
+    `.trim();
+
+    let defaultViewMatrix = [
+        0.47, 0.04, 0.88, 0, -0.11, 0.99, 0.02, 0, -0.88, -0.11, 0.47, 0, 0.07,
+        0.03, 6.55, 1,
+    ];
+    let viewMatrix = defaultViewMatrix;
+    async function main() {
+        let carousel = true;
+        const params = new URLSearchParams(location.search);
+        try {
+            viewMatrix = JSON.parse(decodeURIComponent(location.hash.slice(1)));
+            carousel = false;
+        } catch (err) {}
+        const url = new URL(
+            // "nike.splat",
+            // location.href,
+            params.get("url") || "vizcaya.splat",
+            "https://gaussiansplats.s3.amazonaws.com/",
+        );
+
+    
     const req = await fetch(url, {
         mode: "cors", // no-cors, *cors, same-origin
         credentials: "omit", // include, *same-origin, omit
@@ -1504,18 +1510,32 @@ async function main() {
             buffer: splatData.buffer,
             vertexCount: Math.floor(bytesRead / rowLength),
         });
-}
+    }
 
-main().catch((err) => {
-    document.getElementById("spinner").style.display = "none";
-    document.getElementById("message").innerText = err.toString();
-});
+    
+    const selectedOption = ref('');
 
-  onMounted(() => {
-    main(); 
-  });
+    const updateQueryParam = () => {
+        const newUrl = window.location.pathname + (selectedOption.value ? `?url=${selectedOption.value}` : '');
+        window.history.pushState({ path: newUrl }, '', newUrl);
+        window.location.href = newUrl;
+    };
+
+    main().catch((err) => {
+        document.getElementById("spinner").style.display = "none";
+        document.getElementById("message").innerText = err.toString();
+    });
+
+    onMounted(() => {
+        main(); 
+    });
+
+    watch(selectedOption, () => {
+        updateQueryParam();
+    });
 </script>
 <style>
+
     .scene,
     #message {
       position: absolute;
@@ -1607,17 +1627,29 @@ main().catch((err) => {
     display: none;
     position: absolute;
     top: 0;
-    right: 100%; /* Adjust the distance from the logo */
+    right: 100%; 
     background-color: #fff;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    width: 300px; /* Adjust the width as needed */
+    width: 300px; 
     /* transition: all 0.3s ease-in-out; */
     }
 
     .instructions-content.expanded {
     display: block;
     }
+
+    .dropdown {
+    position: absolute;
+    top: 5px; /* Adjust as needed */
+    left: -250%; /* Adjust as needed */
+    padding: 10px;
+    border: 0px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    width: 100px; /* Adjust as needed */
+    }
+
 </style>

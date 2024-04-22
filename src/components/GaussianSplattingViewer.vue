@@ -36,19 +36,28 @@
                 <div id="instructions">
                     <h6><b>Controls</b></h6>
                     <ul>
-                        <li>Movement (arrow keys):
+                        <li>Camera angle:
                         <ul>
+                            <li>- Left click hold and drag</li>
+                            <li>- A/D to turn camera left/right</li>
+                            <li>- W/S to tilt camera up/down</li>
+                            <li>- Q/E to roll camera counterclockwise/clockwise</li>
+                            <li>- I/K and J/L to orbit</li>
+                        </ul>
+                        </li>
+                        <li>Movement:
+                        <ul>
+                            <li>- Ctrl + left click to strafe side to side and zoom in/out</li>
                             <li>- Left/right arrow keys to strafe side to side</li>
                             <li>- Up/down arrow keys to move forward/back</li>
                             <li>- Space to jump</li>
                         </ul>
                         </li>
-                        <li>Camera angle (WASD):
+                        <li>Scroll Wheel:
                         <ul>
-                            <li>- A/D to turn camera left/right</li>
-                            <li>- W/S to tilt camera up/down</li>
-                            <li>- Q/E to roll camera counterclockwise/clockwise</li>
-                            <li>- I/K and J/L to orbit</li>
+                            <li>- Scroll Wheel to zoom in/out</li>
+                            <li>- Scroll Wheel + Shift to tilt camera</li>
+                            <li>- Scroll Wheel + Ctrl to translate up/down</li>
                         </ul>
                         </li>
                     </ul>
@@ -1036,13 +1045,20 @@
                         : 1;
                 let inv = invert4(viewMatrix);
                 if (e.shiftKey) {
+                    let d = 4;
+                    inv = translate4(inv, 0, 0, d);
+                    inv = rotate4(inv, -(e.deltaX * scale) / innerWidth, 0, 1, 0);
+                    inv = rotate4(inv, (e.deltaY * scale) / innerHeight, 1, 0, 0);
+                    inv = translate4(inv, 0, 0, -d);
+                    
+                } else if (e.ctrlKey || e.metaKey) {
                     inv = translate4(
                         inv,
                         (e.deltaX * scale) / innerWidth,
                         (e.deltaY * scale) / innerHeight,
                         0,
                     );
-                } else if (e.ctrlKey || e.metaKey) {
+                } else {
                     // inv = rotate4(inv,  (e.deltaX * scale) / innerWidth,  0, 0, 1);
                     // inv = translate4(inv,  0, (e.deltaY * scale) / innerHeight, 0);
                     // let preY = inv[13];
@@ -1053,12 +1069,6 @@
                         (-10 * (e.deltaY * scale)) / innerHeight,
                     );
                     // inv[13] = preY;
-                } else {
-                    let d = 4;
-                    inv = translate4(inv, 0, 0, d);
-                    inv = rotate4(inv, -(e.deltaX * scale) / innerWidth, 0, 1, 0);
-                    inv = rotate4(inv, (e.deltaY * scale) / innerHeight, 1, 0, 0);
-                    inv = translate4(inv, 0, 0, -d);
                 }
 
                 viewMatrix = invert4(inv);
@@ -1072,14 +1082,14 @@
             e.preventDefault();
             startX = e.clientX;
             startY = e.clientY;
-            down = e.ctrlKey || e.metaKey ? 2 : 1;
+            // down = e.ctrlKey || e.metaKey ? 2 : 1;
+            down = e.button === 0 ? 1 : e.button === 2 ? 2 : 0;
         });
         canvas.addEventListener("contextmenu", (e) => {
             carousel = false;
             e.preventDefault();
             startX = e.clientX;
             startY = e.clientY;
-            down = 2;
         });
 
         canvas.addEventListener("mousemove", (e) => {
@@ -1103,15 +1113,12 @@
                 startY = e.clientY;
             } else if (down == 2) {
                 let inv = invert4(viewMatrix);
-                // inv = rotateY(inv, );
-                // let preY = inv[13];
                 inv = translate4(
                     inv,
                     (-10 * (e.clientX - startX)) / innerWidth,
-                    0,
                     (10 * (e.clientY - startY)) / innerHeight,
+                    0,
                 );
-                // inv[13] = preY;
                 viewMatrix = invert4(inv);
 
                 startX = e.clientX;
@@ -1512,8 +1519,9 @@
     }
 
     const options = [
-      { value: 'vizcaya.splat', label: 'Vizcaya' },
       { value: 'herodotus.splat', label: 'Herodotus' },
+      { value: 'apollo.splat', label: 'Apollo' },
+      { value: 'vizcaya.splat', label: 'Vizcaya' },
       { value: 'dragon.splat', label: 'Dragon' }
     ];
     const selectedOption = ref(options[0].value);

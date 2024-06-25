@@ -1,4 +1,4 @@
-import {createRouter} from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router';
 import Homepage from './Home.vue';
 import GaussianSplatting from './GaussianSplatting.vue';
 import Photogrammetry from './Photogrammetry.vue';
@@ -35,7 +35,7 @@ const routes = [
 
 export default function (history) {
   return createRouter({
-    history,
+    history: createWebHistory(import.meta.env.BASE_URL),
     routes
   })
 }

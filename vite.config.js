@@ -5,10 +5,20 @@ import nightwatchPlugin from 'vite-plugin-nightwatch'
 // https://vitejs.dev/config/
 export default defineConfig({
   build: {
-    base: '/personal-website/',
+    rollupOptions: {
+      output: {
+        format: 'amd',
+        amd: {
+          autoId: true,
+          basePath: '/personal-website/'
+        }
+      }
+    }
   },
   plugins: [
     vue(),
     nightwatchPlugin()
   ]
 })
+
+

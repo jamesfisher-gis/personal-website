@@ -1,7 +1,7 @@
 {
-  "name": "middlemarch",
+  "name": "personal website",
   "version": "0.0.0",
-  "author": "George Eliot",
+  "author": "James Fisher",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

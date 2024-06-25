@@ -21,7 +21,7 @@ export const useProjects = defineStore('topic-store', {
   actions: {
     async fetchProjects() {
       this.fetching = true;
-      const response = await fetch('/data/projects.json');
+      const response = await fetch('https://raw.githubusercontent.com/jamesfisher-gis/personal-website/main/public/data/projects.json');
       try {
         const result = await response.json();
         this.projects = result.projects;

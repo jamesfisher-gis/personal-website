@@ -6,6 +6,7 @@ export default defineConfig(({ command, mode }) => {
   if (command === 'build') {
       return {
         base: '/personal-website/',
+        baseAssets: '/personal-website/',
         plugins: [
           vue(),
           nightwatchPlugin()

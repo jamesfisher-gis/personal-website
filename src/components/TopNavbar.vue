@@ -1,76 +1,62 @@
 <script setup>
 </script>
+
 <template>
-  <nav class="py-2 fixed-top">
-    <div class="container d-flex flex-wrap">
-      <ul class="nav me-auto">
-        <li class="nav-item"><router-link to="/" class="nav-link px-2 active" aria-current="page">Home</router-link></li>
-        <li class="nav-item"><a href="#" class="nav-link px-2">About Me</a></li>
-        <li class="nav-item"><router-link to="/projects" class="nav-link px-2 active" aria-current="page">Projects</router-link></li>
-        <li class="nav-item"><a href="#" class="nav-link px-2">Contact</a></li>
+  <nav class="top-nav">
+    <div class="container">
+      <ul class="nav top-nav-links">
+        <li class="nav-item">
+          <router-link to="/" class="nav-link" aria-current="page">Home</router-link>
+        </li>
+        <li class="nav-item">
+          <router-link to="/about-me" class="nav-link">About Me</router-link>
+        </li>
+        <li class="nav-item">
+          <router-link to="/projects" class="nav-link">Projects</router-link>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link">Contact</a>
+        </li>
       </ul>
     </div>
   </nav>
 </template>
 
-<style scoped>
-  #dropdownUser2 {
-    min-width: 40px;
-  }
-  nav .dropdown .dropdown-menu {
-    margin-left: -85px !important;
-  }
-  .wrapper .fixed-top {
-    position: sticky;
-    z-index: 2100;
-  }
-  .wrapper nav {
-    background-color: rgba(0,0,0,.8);
-  }
-  .wrapper nav a {
-    color: #e1bee7;
-    font-weight: 500;
-  }
-  .wrapper nav a:hover {
-    color: #f0ad4e;
-  }
-  nav .dropdown-menu a {
-    color: #222;
-  }
-  nav .dropdown-menu a:hover {
-    color: #555;
-  }
+<!-- <style scoped>
+.top-nav {
+  background-color: #0b1a24;
+  padding: 10px 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
 
-  nav .bg-primary {
-    --bs-primary-rgb: 255,190,231;
-    --bs-bg-opacity: .9;
-    color: #0B212B;
-  }
-  .shopping-cart a .badge {
-    font-size: 11px;
-    margin-top:-3px;
-    padding: 3px 6px;
-  }
-</style>
+.top-nav-links {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  align-items: center;
+}
 
-<script>
-import { mapState} from 'pinia'
+.nav-item {
+  margin-right: 20px;
+}
 
-export default {
-  data() {
-    return {
+.nav-link {
+  color: #e1bee7;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.3s ease;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
 
-    };
-  },
-
-  computed: {
-    // ...mapState(useCart, {
-    //   count: 'count'
-    // })
-  },
-
-  methods: {
-
-  }
-};
-</script>
+.nav-link:hover,
+.nav-link.active {
+  color: #f0ad4e;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+</style> -->

@@ -6,7 +6,7 @@ import Projects from '../components/Projects.vue';
 
   <template>
     <div class="wrapper">
-      <TopNavbar />
+      <!-- <TopNavbar /> -->
 
       <div id="top-section" class="top-text">
         <div class="container">
@@ -48,7 +48,7 @@ import Projects from '../components/Projects.vue';
           <Projects />
         </div>
 
-        <Footer />
+        <!-- <Footer /> -->
 
       </div>
 

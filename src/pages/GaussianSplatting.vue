@@ -1,6 +1,6 @@
 <template>
     <div class="wrapper">
-      <TopNavbar />
+      <!-- <TopNavbar /> -->
   
       <!-- Centered GaussianSplattingViewer with 80% width -->
       <div class="centered-window">
@@ -14,8 +14,6 @@
   </template>
   
   <script setup>
-  import TopNavbar from '../components/TopNavbar.vue';
-//   import Footer from '../components/Footer.vue';
   import GaussianSplattingViewer from '../components/GaussianSplattingViewer.vue';
   </script>
   

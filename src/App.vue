@@ -1,19 +1,19 @@
 <script setup>
-// Check out https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup
-
+import TopNavbar from './components/TopNavbar.vue';
+import Footer from './components/Footer.vue';
+import './styles/global.css'; 
 </script>
 
 <template>
+  <TopNavbar />
   <router-view></router-view>
+  <!-- <Footer /> -->
+  <footer>
+    <Footer />
+    <i18n tag="small" path="poweredBy" class="poweredby text-muted">
+      <template #link>
+        <a href="https://github.com/radiantearth/stac-browser" target="_blank">STAC Browser</a> {{ browserVersion }}
+      </template>
+    </i18n>
+  </footer>
 </template>
-
-<style>
-html, body {
-  background-color: #112933!important;
-}
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-</style>

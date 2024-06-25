@@ -4,6 +4,7 @@ import GaussianSplatting from './GaussianSplatting.vue';
 import Photogrammetry from './Photogrammetry.vue';
 import PlaquesMap from './PlaquesMap.vue';
 import Projects from '../components/Projects.vue';
+import AboutMe from './AboutMe.vue';
 
 const routes = [
   {
@@ -25,6 +26,10 @@ const routes = [
   {
     path: '/project/london-plaques/',
     component: PlaquesMap
+  },
+  {
+    path: '/about-me/',
+    component: AboutMe
   },
 ]
 

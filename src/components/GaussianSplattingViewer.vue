@@ -1040,7 +1040,7 @@
                 const scale =
                     e.deltaMode == 1
                         ? lineHeight
-                        : e.deltaMode == 2
+                        : e.deltaMode == 1
                         ? innerHeight
                         : 1;
                 let inv = invert4(viewMatrix);
@@ -1066,7 +1066,7 @@
                         inv,
                         0,
                         0,
-                        (-10 * (e.deltaY * scale)) / innerHeight,
+                        (-2 * (e.deltaY * scale)) / innerHeight,
                     );
                     // inv[13] = preY;
                 }
